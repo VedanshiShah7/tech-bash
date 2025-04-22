@@ -21,7 +21,7 @@ Solace is an app designed to help users break negative thought spirals, deal wit
 
 ### Installation:
 
-#### Try it out as below or on the live page (here)[]
+#### Try it out as below or on the live page [here](https://vedanshishah7.github.io/tech-bash/)
 1. Clone the repository:
 
    git clone https://github.com/VedanshiShah7/tech-bash.git

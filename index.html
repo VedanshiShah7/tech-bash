@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solace — Reflect, Feel, Grow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fefefe;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #4a4a4a;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 2rem;
+    }
+
+    .prompt {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #555;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 1rem;
+      cursor: crosshair;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button, .controls input[type="color"] {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .controls button {
+      background-color: #6c63ff;
+      color: white;
+    }
+
+    .controls button:hover {
+      background-color: #584ddf;
+    }
+
+    .entries {
+      margin-top: 2rem;
+    }
+
+    .entry {
+      border-top: 1px solid #ddd;
+      padding: 1rem 0;
+    }
+
+    .entry img {
+      max-width: 100px;
+      margin-right: 1rem;
+      border-radius: 4px;
+    }
+
+    .persona-select {
+      margin-bottom: 1rem;
+    }
+
+    .persona-description {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    .color-preview {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      border: 1px solid #000;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .file-upload {
+      margin-top: 1rem;
+    }
+
+    .mic-btn {
+      background-color: #28a745;
+      color: white;
+      border-radius: 6px;
+      padding: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .mic-btn:active {
+      background-color: #218838;
+    }
+
+    .analyze-btn {
+      background-color: #ff8500;
+      color: white;
+      border-radius: 6px;
+      padding: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .analyze-btn:active {
+      background-color: #e07b00;
+    }
+
+    .timeline {
+      margin-top: 2rem;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+    }
+
+    .timeline-entry {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .positive {
+      background-color: #d4edda;
+    }
+
+    .negative {
+      background-color: #f8d7da;
+    }
+
+    .neutral {
+      background-color: #fff3cd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>solace</h1>
+      <p class="tagline">A space to reflect, feel, draw, and grow with your voice, words, images, and heart.</p>
+    </header>
+
+    <main>
+      <!-- Persona Selection -->
+      <div class="persona-select">
+        <label for="persona">Choose Your Persona:</label>
+        <select id="persona">
+          <option value="none">-- Select --</option>
+          <option value="The Reflector">🪞 The Reflector</option>
+          <option value="The Dreamer">🌙 The Dreamer</option>
+          <option value="The Grounded One">🌱 The Grounded One</option>
+        </select>
+        <p id="personaDescription" class="persona-description"></p>
+      </div>
+
+      <p id="prompt" class="prompt"><em>Loading prompt...</em></p>
+      <textarea id="textInput" placeholder="Write your thoughts..."></textarea>
+
+      <div class="file-upload">
+        <label>Optional Image:</label>
+        <input type="file" id="imageUpload" accept="image/*" />
+      </div>
+
+      <canvas id="canvas" width="600" height="200"></canvas>
+
+      <div class="controls">
+        <input type="color" id="colorPicker" value="#000000" />
+        <span class="color-preview" id="colorPreview"></span>
+        <button id="clearBtn">Clear Drawing</button>
+        <button id="saveBtn">Save Entry</button>
+        <button id="toggleDrawing">Toggle Drawing Mode</button>
+        <button id="micBtn" class="mic-btn">🎤 Start Voice</button>
+        <button id="analyzeBtn" class="analyze-btn">Analyze Sentiment</button>
+      </div>
+
+      <section class="entries">
+        <h2>Past Entries</h2>
+        <ul id="entriesList"></ul>
+      </section>
+
+      <section class="timeline">
+        <h2>Timeline</h2>
+        <ul id="timelineList"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const textInput = document.getElementById("textInput");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const colorPicker = document.getElementById("colorPicker");
+    const colorPreview = document.getElementById("colorPreview");
+    const clearBtn = document.getElementById("clearBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const toggleDrawing = document.getElementById("toggleDrawing");
+    const micBtn = document.getElementById("micBtn");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const imageUpload = document.getElementById("imageUpload");
+    const personaSelect = document.getElementById("persona");
+    const personaDescription = document.getElementById("personaDescription");
+    const entriesList = document.getElementById("entriesList");
+    const timelineList = document.getElementById("timelineList");
+    const promptEl = document.getElementById("prompt");
+
+    const prompts = [
+      "What’s something that made you smile today?",
+      "Describe a moment you felt truly at peace.",
+      "What are you grateful for right now?",
+      "Draw what calm feels like.",
+      "Describe a dream you had recently.",
+      "Who or what grounds you?"
+    ];
+
+    let drawing = false;
+    let drawingEnabled = true;
+    let recognition;
+
+    function randomPrompt() {
+      promptEl.textContent = prompts[Math.floor(Math.random() * prompts.length)];
+    }
+
+    randomPrompt();
+
+    // Voice to Text - Web Speech API
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = function(event) {
+        const transcript = event.results[event.resultIndex][0].transcript;
+        textInput.value = transcript;
+      };
+
+      micBtn.onclick = () => {
+        if (recognition) {
+          recognition.start();
+          micBtn.textContent = "🔴 Listening...";
+        }
+      };
+    } else {
+      micBtn.style.display = "none"; // Hide if the browser doesn't support speech recognition
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      if (!drawingEnabled) return;
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mouseout", () => drawing = false);
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!drawingEnabled || !drawing) return;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.stroke();
+    });
+
+    colorPicker.addEventListener("input", () => {
+      colorPreview.style.backgroundColor = colorPicker.value;
+    });
+
+    clearBtn.onclick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    toggleDrawing.onclick = () => {
+      drawingEnabled = !drawingEnabled;
+      toggleDrawing.textContent = drawingEnabled ? "Disable Drawing" : "Enable Drawing";
+    };
+
+    // Sentiment Analysis
+    analyzeBtn.onclick = () => {
+      const text = textInput.value;
+      let sentiment = "neutral";
+      if (text.includes("happy") || text.includes("joy")) {
+        sentiment = "positive";
+      } else if (text.includes("sad") || text.includes("angry")) {
+        sentiment = "negative";
+      }
+      alert(`Sentiment: ${sentiment}`);
+    };
+
+    // Save Entry
+    saveBtn.onclick = () => {
+      const timestamp = new Date();
+      const entry = {
+        text: textInput.value,
+        image: imageUpload.files[0] ? URL.createObjectURL(imageUpload.files[0]) : "",
+        timestamp: timestamp.toLocaleString(),
+        sentiment: textInput.value.includes("happy") ? "positive" : textInput.value.includes("sad") ? "negative" : "neutral"
+      };
+
+      const listItem = document.createElement("li");
+      listItem.className = "entry";
+      listItem.innerHTML = `
+        <strong>${entry.timestamp}</strong><br />
+        <p class="${entry.sentiment}">${entry.text}</p>
+        ${entry.image ? `<img src="${entry.image}" alt="image" />` : ""}
+      `;
+      entriesList.appendChild(listItem);
+
+      // Add entry to Timeline
+      const timelineItem = document.createElement("li");
+      timelineItem.className = "timeline-entry";
+      timelineItem.innerHTML = `
+        <p><strong>${entry.timestamp}</strong></p>
+        <p class="${entry.sentiment}">${entry.text}</p>
+        ${entry.image ? `<img src="${entry.image}" alt="image" />` : ""}
+      `;
+      timelineList.appendChild(timelineItem);
+    };
+
+    personaSelect.addEventListener("change", (e) => {
+      const persona = e.target.value;
+      let description = "";
+      if (persona === "The Reflector") {
+        description = "You are someone who finds value in reflecting deeply on your experiences.";
+      } else if (persona === "The Dreamer") {
+        description = "You have a vivid imagination and enjoy exploring the unknown.";
+      } else if (persona === "The Grounded One") {
+        description = "You are deeply connected with nature and thrive in simplicity.";
+      }
+      personaDescription.textContent = description;
+    });
+  </script>
+</body>
+</html>

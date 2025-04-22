@@ -1,0 +1,81 @@
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+}
+
+header h1 {
+  font-size: 3rem;
+  margin-bottom: 0.2rem;
+  color: #547aa5;
+}
+
+.tagline {
+  font-style: italic;
+  color: #777;
+}
+
+.prompt {
+  font-size: 1.1rem;
+  color: #5a5a5a;
+  margin-bottom: 1rem;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  background-color: #547aa5;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3c5b82;
+}
+
+.sentiment {
+  background: #edf0f5;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.entry-history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.entry-history li {
+  background: #ffffff;
+  border-left: 4px solid #547aa5;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+}

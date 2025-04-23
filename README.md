@@ -11,6 +11,10 @@ Solace is an app designed to help users break negative thought spirals, deal wit
 - **Save Entries**: Users can save their text entries and drawings for later reflection.
 - **Responsive UI/UX**: The app features a user-friendly interface with interactive elements, ensuring a smooth experience across devices.
 
+[View Tech Bash PDF](./Tech%20Bash.pdf)
+
+[View Website](https://vedanshishah7.github.io/tech-bash/)
+
 ### Requirements:
 - **Node.js** (v14 or higher)
 - **React** (v18 or higher)

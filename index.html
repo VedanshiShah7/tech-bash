@@ -5,12 +5,29 @@
   <title>Solace — Reflect, Feel, Grow</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --color-bg-light: #FAFAFA;
+      --color-bg-dark: #2E294E;
+      --color-text-light: #333;
+      --color-text-dark: #FAFAFA;
+      --accent: #B497BD;
+      --secondary: #A9C4D6;
+      --highlight: #E6C5D7;
+      --default-brush-color: #000000;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #fefefe;
+      background: var(--color-bg-light);
       margin: 0;
       padding: 0;
-      color: #333;
+      color: var(--color-text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark-theme {
+      background: var(--color-bg-dark);
+      color: var(--color-text-dark);
     }
 
     .container {
@@ -21,24 +38,34 @@
 
     header {
       text-align: center;
+      position: relative;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
     }
 
     h1 {
       font-size: 2.5rem;
       margin: 0;
-      color: #4a4a4a;
+      color: var(--accent);
     }
 
     .tagline {
       font-size: 1rem;
-      color: #888;
+      color: var(--secondary);
       margin-bottom: 2rem;
     }
 
     .prompt {
       font-size: 1.2rem;
       margin-bottom: 1rem;
-      color: #555;
+      color: var(--highlight);
     }
 
     textarea {
@@ -64,9 +91,10 @@
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    .controls button, .controls input[type="color"] {
+    .controls button, .controls input[type="color"], .controls input[type="range"] {
       padding: 0.5rem 1rem;
       font-size: 0.9rem;
       border: none;
@@ -75,12 +103,12 @@
     }
 
     .controls button {
-      background-color: #6c63ff;
+      background-color: var(--accent);
       color: white;
     }
 
     .controls button:hover {
-      background-color: #584ddf;
+      background-color: #9473b3;
     }
 
     .entries {
@@ -179,6 +207,7 @@
 <body>
   <div class="container">
     <header>
+      <div class="theme-toggle" id="themeToggle">🌞</div>
       <h1>solace</h1>
       <p class="tagline">A space to reflect, feel, draw, and grow with your voice, words, images, and heart.</p>
     </header>
@@ -207,7 +236,10 @@
       <canvas id="canvas" width="600" height="200"></canvas>
 
       <div class="controls">
+        <label for="colorPicker">Brush Color:</label>
         <input type="color" id="colorPicker" value="#000000" />
+        <label for="brushSize">Size:</label>
+        <input type="range" id="brushSize" min="1" max="20" value="2" />
         <span class="color-preview" id="colorPreview"></span>
         <button id="clearBtn">Clear Drawing</button>
         <button id="saveBtn">Save Entry</button>
@@ -234,6 +266,7 @@
     const ctx = canvas.getContext("2d");
     const colorPicker = document.getElementById("colorPicker");
     const colorPreview = document.getElementById("colorPreview");
+    const brushSize = document.getElementById("brushSize");
     const clearBtn = document.getElementById("clearBtn");
     const saveBtn = document.getElementById("saveBtn");
     const toggleDrawing = document.getElementById("toggleDrawing");
@@ -245,6 +278,7 @@
     const entriesList = document.getElementById("entriesList");
     const timelineList = document.getElementById("timelineList");
     const promptEl = document.getElementById("prompt");
+    const themeToggle = document.getElementById("themeToggle");
 
     const prompts = [
       "What’s something that made you smile today?",
@@ -283,7 +317,7 @@
         }
       };
     } else {
-      micBtn.style.display = "none"; // Hide if the browser doesn't support speech recognition
+      micBtn.style.display = "none";
     }
 
     canvas.addEventListener("mousedown", (e) => {
@@ -300,7 +334,7 @@
       if (!drawingEnabled || !drawing) return;
       ctx.lineTo(e.offsetX, e.offsetY);
       ctx.strokeStyle = colorPicker.value;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = brushSize.value;
       ctx.lineCap = "round";
       ctx.stroke();
     });
@@ -318,7 +352,6 @@
       toggleDrawing.textContent = drawingEnabled ? "Disable Drawing" : "Enable Drawing";
     };
 
-    // Sentiment Analysis
     analyzeBtn.onclick = () => {
       const text = textInput.value;
       let sentiment = "neutral";
@@ -330,7 +363,6 @@
       alert(`Sentiment: ${sentiment}`);
     };
 
-    // Save Entry
     saveBtn.onclick = () => {
       const timestamp = new Date();
       const entry = {
@@ -349,7 +381,6 @@
       `;
       entriesList.appendChild(listItem);
 
-      // Add entry to Timeline
       const timelineItem = document.createElement("li");
       timelineItem.className = "timeline-entry";
       timelineItem.innerHTML = `
@@ -372,6 +403,15 @@
       }
       personaDescription.textContent = description;
     });
+
+    // Theme toggle
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-theme");
+      themeToggle.textContent = document.body.classList.contains("dark-theme") ? "🌜" : "🌞";
+    });
+
+    // Initialize color preview
+    colorPreview.style.backgroundColor = colorPicker.value;
   </script>
 </body>
 </html>
